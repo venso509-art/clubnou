@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tablo Bò Administratè - ClubNou</title>
+  <meta name="description" content="Espas jesyon ak tablo bò ofisyèl pou administratè rezo ClubNou.">
+  <link rel="icon" type="image/png" href="Images/logo-clubnou.png">
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Tailwind CSS CDN pou kouri dirèkteman sou Netlify ak nenpòt sèvè -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            },
+            dark: {
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#020617'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- ========================================== -->
+  <!-- 1. MODAL OTANTIFIKASYON MODPAS ADMIN       -->
+  <!-- ========================================== -->
+  <div 
+    id="passwordPromptModal" 
+    class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="passwordModalTitle"
+  >
+    <div class="w-full max-w-md bg-slate-800/95 border border-slate-700/90 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden backdrop-blur-xl">
+      <!-- Glow accent decoration -->
+      <div class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center mb-3">
+          <img 
+            src="Images/logo-clubnou.png" 
+            alt="Logo ClubNou" 
+            class="w-16 h-16 rounded-full object-cover shadow-lg" 
+            style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid #b0950d; box-shadow: 0 4px 12px rgba(176, 149, 13, 0.3);"
+            onerror="this.src='https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=120&q=80'"
+          />
+        </div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[11px] font-bold tracking-wider uppercase mb-2 border border-emerald-500/20">
+          <span>🔒 Verifikasyon Sekirite</span>
+        </div>
+        <h2 id="passwordModalTitle" class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">Otantifikasyon Administratè</h2>
+        <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+          Tanpri antre modpas administratè w la pou verifye aksè w epi jere platfòm ClubNou an sekirite.
+        </p>
+      </div>
+
+      <form id="passwordPromptForm" onsubmit="handlePasswordPrompt(event)" class="space-y-4">
+        
+        <!-- Banner Bloke pou 30 Minit lè 3 tantativ echwe -->
+        <div id="lockoutBanner" class="hidden bg-rose-950/80 border border-rose-500/50 rounded-2xl p-4 text-center space-y-2.5 backdrop-blur-sm">
+          <div class="inline-flex items-center justify-center w-11 h-11 rounded-full bg-rose-500/20 text-rose-400 text-lg border border-rose-500/30">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div>
+            <h4 class="text-sm font-black text-white tracking-wide">Espas Admin Bloke pou 30 Minit</h4>
+            <p class="text-xs text-rose-200/90 mt-1 leading-relaxed">
+              Ou fin depase limit 3 tantativ yo (<span class="font-bold text-rose-300">3/3</span>). Pou garanti sekirite platfòm nan, tout tantativ koneksyon sispann pou 30 minit.
+            </p>
+          </div>
+          <div class="pt-1">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-950/90 border border-rose-500/40 text-rose-400 font-mono text-lg font-black tracking-widest shadow-inner">
+              <i class="fa-regular fa-clock text-xs text-rose-400 animate-spin" style="animation-duration: 4s;"></i>
+              <span id="lockoutCountdownText">30:00</span>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">Aksè a ap retounen otomatikman lè tan sa a fini.</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label for="promptPasswordInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+              Modpas Administratè
+            </label>
+            <span id="attemptsBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-900 border border-slate-700 text-slate-300 transition-all">
+              <i class="fa-solid fa-shield-halved text-[10px] text-emerald-400"></i>
+              <span>Tantativ: <strong id="attemptsCountText" class="text-white font-mono">0/3</strong></span>
+            </span>
+          </div>
+          <div class="relative">
+            <input 
+              type="password" 
+              id="promptPasswordInput" 
+              placeholder="Antre modpas administratè w la" 
+              required
+              autocomplete="current-password"
+              autofocus
+              class="w-full pl-4 pr-24 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+            />
+            <button 
+              type="button" 
+              id="togglePasswordBtn"
+              onclick="togglePromptPasswordVisibility()" 
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 transition-colors"
+            >
+              👁️ Montre
+            </button>
+          </div>
+
+          <!-- Mesaj Erè / Notifikasyon Sekirite lè modpas la pa kòrèk -->
+          <div id="promptErrorMsg" class="hidden text-xs text-rose-300 mt-2.5 font-semibold flex items-start gap-2.5 bg-rose-500/15 border border-rose-500/30 p-3 rounded-xl">
+            <i class="fa-solid fa-triangle-exclamation text-rose-400 text-sm mt-0.5 shrink-0"></i>
+            <span id="promptErrorText">Modpas la pa kòrèk. Tanpri verifye l epi re-eseye!</span>
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          id="promptSubmitBtn"
+          class="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+        >
+          <span>Verifye & Afiche Done Manm yo</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+          </svg>
+        </button>
+
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+          <a href="index.html" class="text-emerald-400 hover:text-emerald-300 underline transition-colors">
+            ← Tounen sou Sit Prensipal la
+          </a>
+          <span class="text-[11px] text-slate-500 flex items-center gap-1.5">
+            <span>🔒</span> <span>Espas Otorize & Pwoteje</span>
+          </span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- 2. PANÈL ADMIN (DASHBOARD)                 -->
+  <!-- ========================================== -->
+  <div id="dashboardSection" class="flex-1 flex flex-col min-h-screen">
+    
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700/80 sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img 
+            src="Images/logo-clubnou.png" 
+            alt="Logo ClubNou" 
+            class="w-10 h-10 rounded-full object-cover shrink-0" 
+            style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #b0950d; box-shadow: 0 2px 6px rgba(176, 149, 13, 0.25);"
+            onerror="this.src='https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=80&q=80'"
+          />
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-white tracking-tight"><span>Club</span><span class="text-[#b0950d]">Nou</span></span>
+              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Admin</span>
+            </div>
+            <p class="text-[11px] text-slate-400 hidden sm:block">Tablo Bò Jesyon Manm & Kominote</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button 
+            type="button"
+            onclick="openChangePasswordModal()" 
+            class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-medium transition-colors flex items-center gap-1.5"
+            title="Chanje modpas administratè a"
+          >
+            <span>🔑</span>
+            <span>Chanje Modpas</span>
+          </button>
+          <a 
+            href="index.html" 
+            target="_blank" 
+            class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-medium text-slate-200 transition-colors flex items-center gap-1.5"
+          >
+            <span>Al sou Sit la</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+          <button 
+            onclick="handleLogout()" 
+            class="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-medium transition-colors flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            <span>Dekonekte</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      
+      <!-- Header Salutation & Actions -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Lis Manm ki Enskri nan Rezo a</h2>
+          <p class="text-sm text-slate-400 mt-1">Konsilte tout jèn ki soumèt fòm priyoritè WhatsApp la sou clubnou.com</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button 
+            onclick="exportToCSV()" 
+            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow transition-all flex items-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            <span>Ekspòte an CSV (Excel)</span>
+          </button>
+          <button 
+            onclick="openAddMemberModal()" 
+            class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-2"
+          >
+            <span>+ Ajoute Manm Manyèlman</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Statistics Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Manm</span>
+            <span class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-sm">👥</span>
+          </div>
+          <p id="kpiTotalMembers" class="text-3xl font-extrabold text-white mt-3">0</p>
+          <p class="text-[11px] text-emerald-400 mt-1 font-medium">Rezo nasyonal aktif</p>
+        </div>
+
+        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Kontakte sou WhatsApp</span>
+            <span class="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-400 flex items-center justify-center font-bold text-sm">💬</span>
+          </div>
+          <p id="kpiContactedMembers" class="text-3xl font-extrabold text-white mt-3">0</p>
+          <p class="text-[11px] text-slate-400 mt-1">Manm ki deja nan kominikasyon</p>
+        </div>
+
+        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Depatman Reprezante</span>
+            <span class="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-sm">📍</span>
+          </div>
+          <p id="kpiDepartmentsCount" class="text-3xl font-extrabold text-white mt-3">0</p>
+          <p class="text-[11px] text-cyan-400 mt-1">Sou 10 depatman an Ayiti</p>
+        </div>
+
+        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Atik Baz Done</span>
+            <span class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-sm">📰</span>
+          </div>
+          <p id="kpiTotalArticles" class="text-3xl font-extrabold text-white mt-3">3</p>
+          <p class="text-[11px] text-amber-400 mt-1">Atik nan articles.json</p>
+        </div>
+      </div>
+
+      <!-- Filters & Search Toolbar -->
+      <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div class="w-full md:w-80 relative">
+          <input 
+            type="text" 
+            id="searchInput" 
+            oninput="handleSearch()" 
+            placeholder="Chèche pa non, WhatsApp, vil..." 
+            class="w-full pl-9 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
+          <svg class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+          <select 
+            id="departmentFilter" 
+            onchange="handleFilter()" 
+            class="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
+            <option value="all">Tout Depatman yo</option>
+            <option value="Owès">Owès (Pòtoprens, Dèlma...)</option>
+            <option value="Nò">Nò (Kap-Ayisyen...)</option>
+            <option value="Latibonit">Latibonit (Gonayiv, Sen Mak...)</option>
+            <option value="Sid">Sid (Okay...)</option>
+            <option value="Sant">Sant (Ench, Mibalè...)</option>
+            <option value="Nòdwès">Nòdwès (Pòdpè...)</option>
+            <option value="Nòdès">Nòdès (Wanament...)</option>
+            <option value="Sidès">Sidès (Jakmèl...)</option>
+            <option value="Grandans">Grandans (Jeremi...)</option>
+            <option value="Nip">Nip (Miragwàn...)</option>
+          </select>
+
+          <button 
+            onclick="resetDemoData()" 
+            class="text-xs text-slate-400 hover:text-slate-200 underline px-2 py-1" 
+            title="Reyinisyalize lis la avèk egzanp manm yo"
+          >
+            Reyinisyalize Egzanp
+          </button>
+        </div>
+      </div>
+
+      <!-- Members Data Table -->
+      <div class="bg-slate-800/80 border border-slate-700 rounded-2xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-700">
+              <tr>
+                <th scope="col" class="py-3.5 px-4">Manm & Non</th>
+                <th scope="col" class="py-3.5 px-4">WhatsApp & Kontak</th>
+                <th scope="col" class="py-3.5 px-4">Depatman</th>
+                <th scope="col" class="py-3.5 px-4">Domèn / Pwofesyon</th>
+                <th scope="col" class="py-3.5 px-4">Deskripsyon (Bio)</th>
+                <th scope="col" class="py-3.5 px-4">Dat Enskripsyon</th>
+                <th scope="col" class="py-3.5 px-4 text-right">Aksyon</th>
+              </tr>
+            </thead>
+            <tbody id="membersTableBody" class="divide-y divide-slate-700/60 font-medium">
+              <!-- Rann dinamikman pa JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty state -->
+        <div id="noResultsNotice" class="hidden p-12 text-center">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-700/50 text-slate-400 mb-3">
+            🔍
+          </div>
+          <h3 class="text-sm font-semibold text-white">Pa gen okenn manm ki koresponn</h3>
+          <p class="text-xs text-slate-400 mt-1">Eseye chanje kritè rechèch ou yo oswa ajoute yon nouvo manm.</p>
+        </div>
+      </div>
+
+      <!-- Seksyon Espesyal: Piblikasyon Atik -->
+      <div class="bg-gradient-to-r from-emerald-950/40 via-slate-800 to-slate-800 border border-emerald-500/30 rounded-2xl p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <h3 class="text-base font-bold text-white">Sistèm Otonòm Piblikasyon ClubNou</h3>
+            </div>
+            <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+              Sistèm nan pwograme pou pibliye nouvo analiz ak atik pwofon regilyèman pou kenbe manm yo toujou enfòme sou opòtinite ak dinamik ekonomik yo.
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <a 
+              href="index.html#atik" 
+              class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-950 border border-slate-700 text-xs font-semibold text-white transition-all"
+            >
+              Gade Carousel Atik sou Sit la →
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Admin Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+      ClubNou (clubnou.com) &copy; 2026 - Fondatè: Clauvens EXAUS (+509 3537-1184)
+    </footer>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: AJOUTE MANM MANÈLMAN                -->
+  <!-- ========================================== -->
+  <div id="addMemberModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <button 
+        onclick="closeAddMemberModal()" 
+        class="absolute right-4 top-4 text-slate-400 hover:text-white text-lg"
+      >
+        ✕
+      </button>
+
+      <h3 class="text-lg font-bold text-white mb-1">Ajoute yon Nouvo Manm</h3>
+      <p class="text-xs text-slate-400 mb-5">Anrejistre yon manm manyèlman nan baz done lokal la.</p>
+
+      <form id="manualAddForm" onsubmit="handleManualAdd(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Prenon *</label>
+            <input type="text" id="mFirstName" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Nom *</label>
+            <input type="text" id="mLastName" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Nimewo WhatsApp *</label>
+          <input type="tel" id="mWhatsApp" placeholder="+509 3537 1184" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Email</label>
+          <input type="email" id="mEmail" placeholder="egzanp@gmail.com" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Depatman *</label>
+            <select id="mDepartment" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
+              <option value="Owès">Owès</option>
+              <option value="Nò">Nò</option>
+              <option value="Latibonit">Latibonit</option>
+              <option value="Sid">Sid</option>
+              <option value="Sant">Sant</option>
+              <option value="Nòdwès">Nòdwès</option>
+              <option value="Nòdès">Nòdès</option>
+              <option value="Sidès">Sidès</option>
+              <option value="Grandans">Grandans</option>
+              <option value="Nip">Nip</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Domèn / Etid</label>
+            <input type="text" id="mDomain" placeholder="Jesyon, Agwonomi..." class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Deskripsyon (Bio)</label>
+          <textarea id="mBio" rows="2" placeholder="Motivasyon oswa pwojè manm lan..." class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"></textarea>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeAddMemberModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg">Anile</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg">Sove Manm lan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- MODAL CHANJE MODPAS ADMINISTRATÈ           -->
+  <!-- ========================================== -->
+  <div id="changePasswordModal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <button onclick="closeChangePasswordModal()" class="absolute right-4 top-4 text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+        <span>🔑</span> Chanje Modpas Administratè
+      </h3>
+      <p class="text-xs text-slate-400 mb-4">Mete yon nouvo modpas pèsonèl pou kontwole aksè nan espas admin ClubNou an.</p>
+      
+      <form onsubmit="handleChangePasswordSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Modpas Aktyèl</label>
+          <input type="password" id="currentAdminPassInput" required class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Antre modpas kounye a">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Nouvo Modpas (omwen 6 karaktè)</label>
+          <input type="password" id="newAdminPassInput" required minlength="6" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Kreye nouvo modpas la">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Konfime Nouvo Modpas la</label>
+          <input type="password" id="confirmNewAdminPassInput" required minlength="6" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Re-antre nouvo modpas la">
+        </div>
+        
+        <div id="changePassErrorMsg" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl font-medium"></div>
+        <div id="changePassSuccessMsg" class="hidden text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-xl font-medium">Modpas la chanje avèk siksè!</div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-medium transition-colors">Anile</button>
+          <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold shadow transition-colors">Sove Nouvo Modpas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT LOGIC POU ADMIN                 -->
+  <!-- ========================================== -->
+  <script>
+    const DEFAULT_ADMIN_PASS = "021996292580";
+    const PASS_VERSION_KEY = "clubnou_admin_pass_v_2026";
+    const ATTEMPTS_KEY = "clubnou_admin_failed_attempts";
+    const LOCKOUT_KEY = "clubnou_admin_lockout_until";
+    const MAX_ATTEMPTS = 3;
+    const LOCKOUT_TIME_MS = 30 * 60 * 1000; // 30 minit
+
+    // Garanti nouvo modpas 021996292580 la pran plas kounye a
+    if (localStorage.getItem(PASS_VERSION_KEY) !== "v_021996292580") {
+      localStorage.setItem("clubnou_admin_password", DEFAULT_ADMIN_PASS);
+      localStorage.setItem(PASS_VERSION_KEY, "v_021996292580");
+    }
+
+    function getAdminPassword() {
+      return localStorage.getItem("clubnou_admin_password") || DEFAULT_ADMIN_PASS;
+    }
+    function setAdminPassword(newPass) {
+      localStorage.setItem("clubnou_admin_password", newPass);
+      localStorage.setItem(PASS_VERSION_KEY, "v_custom_" + Date.now());
+    }
+
+    let lockoutTimerInterval = null;
+
+    function getFailedAttempts() {
+      const attempts = parseInt(localStorage.getItem(ATTEMPTS_KEY) || "0", 10);
+      return isNaN(attempts) ? 0 : attempts;
+    }
+
+    function setFailedAttempts(count) {
+      localStorage.setItem(ATTEMPTS_KEY, count.toString());
+    }
+
+    function getLockoutUntil() {
+      const until = parseInt(localStorage.getItem(LOCKOUT_KEY) || "0", 10);
+      return isNaN(until) ? 0 : until;
+    }
+
+    function setLockoutUntil(timestamp) {
+      localStorage.setItem(LOCKOUT_KEY, timestamp.toString());
+    }
+
+    function clearLockout() {
+      localStorage.removeItem(LOCKOUT_KEY);
+      setFailedAttempts(0);
+      if (lockoutTimerInterval) {
+        clearInterval(lockoutTimerInterval);
+        lockoutTimerInterval = null;
+      }
+    }
+
+    function isCurrentlyLockedOut() {
+      return getLockoutUntil() > Date.now();
+    }
+
+    function updateLockoutStateUI() {
+      const input = document.getElementById("promptPasswordInput");
+      const submitBtn = document.getElementById("promptSubmitBtn");
+      const attemptsBadge = document.getElementById("attemptsBadge");
+      const attemptsCountText = document.getElementById("attemptsCountText");
+      const lockoutBanner = document.getElementById("lockoutBanner");
+      const countdownText = document.getElementById("lockoutCountdownText");
+      const errorMsg = document.getElementById("promptErrorMsg");
+      const errorText = document.getElementById("promptErrorText");
+      const toggleBtn = document.getElementById("togglePasswordBtn");
+
+      const lockoutUntil = getLockoutUntil();
+      const now = Date.now();
+
+      if (lockoutUntil > now) {
+        // Espas la bloke pou 30 minit
+        const remainingMs = lockoutUntil - now;
+        const remainingSecs = Math.ceil(remainingMs / 1000);
+        const mins = Math.floor(remainingSecs / 60);
+        const secs = remainingSecs % 60;
+        const formattedTime = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+        if (lockoutBanner) lockoutBanner.classList.remove("hidden");
+        if (countdownText) countdownText.textContent = formattedTime;
+
+        if (attemptsCountText) attemptsCountText.textContent = "3/3 (Bloke)";
+        if (attemptsBadge) {
+          attemptsBadge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-950/80 border border-rose-500/50 text-rose-300";
+        }
+
+        if (input) {
+          input.disabled = true;
+          input.classList.add("opacity-40", "cursor-not-allowed", "bg-slate-950");
+          input.placeholder = "Espas la bloke pou 30 minit...";
+          input.value = "";
+        }
+        if (toggleBtn) {
+          toggleBtn.disabled = true;
+          toggleBtn.classList.add("opacity-40", "pointer-events-none");
+        }
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.classList.add("opacity-40", "cursor-not-allowed", "pointer-events-none", "grayscale");
+          const span = submitBtn.querySelector("span");
+          if (span) span.textContent = `Aksè Bloke: Rete ${formattedTime}`;
+        }
+
+        // Kòmanse revèy k ap desann chak segond
+        if (!lockoutTimerInterval) {
+          lockoutTimerInterval = setInterval(() => {
+            const currentRemaining = getLockoutUntil() - Date.now();
+            if (currentRemaining <= 0) {
+              clearInterval(lockoutTimerInterval);
+              lockoutTimerInterval = null;
+              clearLockout();
+              updateLockoutStateUI();
+              if (errorMsg) {
+                errorMsg.className = "text-xs text-emerald-300 mt-2.5 font-semibold flex items-start gap-2.5 bg-emerald-500/15 border border-emerald-500/30 p-3 rounded-xl";
+                if (errorText) errorText.textContent = "30 minit yo pase! Espas la deboke kounye a. Ou gen 3 nouvo tantativ.";
+                errorMsg.classList.remove("hidden");
+              }
+            } else {
+              const s = Math.ceil(currentRemaining / 1000);
+              const m = Math.floor(s / 60);
+              const sec = s % 60;
+              const timeStr = `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+              if (countdownText) countdownText.textContent = timeStr;
+              if (submitBtn) {
+                const span = submitBtn.querySelector("span");
+                if (span) span.textContent = `Aksè Bloke: Rete ${timeStr}`;
+              }
+            }
+          }, 1000);
+        }
+      } else {
+        // Pa bloke
+        if (lockoutTimerInterval) {
+          clearInterval(lockoutTimerInterval);
+          lockoutTimerInterval = null;
+        }
+        if (lockoutUntil > 0) {
+          clearLockout();
+        }
+
+        if (lockoutBanner) lockoutBanner.classList.add("hidden");
+
+        if (input) {
+          input.disabled = false;
+          input.classList.remove("opacity-40", "cursor-not-allowed", "bg-slate-950");
+          input.placeholder = "Antre modpas administratè w la";
+        }
+        if (toggleBtn) {
+          toggleBtn.disabled = false;
+          toggleBtn.classList.remove("opacity-40", "pointer-events-none");
+        }
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-40", "cursor-not-allowed", "pointer-events-none", "grayscale");
+          const span = submitBtn.querySelector("span");
+          if (span) span.textContent = "Verifye & Afiche Done Manm yo";
+        }
+
+        const attempts = getFailedAttempts();
+        if (attemptsCountText) attemptsCountText.textContent = `${attempts}/3`;
+        if (attemptsBadge) {
+          if (attempts === 0) {
+            attemptsBadge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-900 border border-slate-700 text-slate-300";
+          } else if (attempts === 1) {
+            attemptsBadge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-950/80 border border-amber-500/50 text-amber-300";
+          } else if (attempts === 2) {
+            attemptsBadge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-950/80 border border-rose-500/50 text-rose-300 animate-pulse";
+          }
+        }
+      }
+    }
+    const STORAGE_KEY = "clubnou_members";
+    const AUTH_KEY = "clubnou_admin_auth";
+
+    // Done egzanp manm yo pou kòmansman
+    const DEFAULT_MEMBERS = [
+      {
+        id: "mb-1",
+        firstName: "Jean",
+        lastName: "Baptiste",
+        whatsapp: "+509 3712-4490",
+        email: "jean.baptiste@gmail.com",
+        department: "Latibonit",
+        domain: "Agwonomi & Koperativ",
+        bio: "Mwen se jèn agwonòm nan Gonayiv, mwen vle patisipe nan tontin modèn pou finanse transfòmasyon mayi.",
+        date: "18 Septanm 2026",
+        status: "Kontakte"
+      },
+      {
+        id: "mb-2",
+        firstName: "Nadège",
+        lastName: "Pierre",
+        whatsapp: "+509 4621-8812",
+        email: "nadege.p@yahoo.com",
+        department: "Nò",
+        domain: "Jesyon Biznis",
+        bio: "Apre filo mwen kòmanse yon ti sèvis patisri nan Okap. Mwen vle aprann jesyon finansyè avèk ClubNou.",
+        date: "17 Septanm 2026",
+        status: "Nouvo"
+      },
+      {
+        id: "mb-3",
+        firstName: "Samuel",
+        lastName: "Dorcé",
+        whatsapp: "+509 3890-1123",
+        email: "samuel.dorce@hotmail.com",
+        department: "Owès",
+        domain: "Enformatik & Dijital",
+        bio: "Jèn pwofesyonèl nan Dèlma, enterese nan sistèm tontin dijital ak devlopman biznis teknolojik.",
+        date: "16 Septanm 2026",
+        status: "Manm Ofisyèl"
+      },
+      {
+        id: "mb-4",
+        firstName: "Marie Esther",
+        lastName: "Saint-Fleur",
+        whatsapp: "+509 3155-7744",
+        email: "esther.stfleur@gmail.com",
+        department: "Sid",
+        domain: "Edikasyon & Kominikasyon",
+        bio: "Mwen nan Okay, mwen vle kowòdone atelye edikasyon finansyè pou jèn fi apre filo.",
+        date: "15 Septanm 2026",
+        status: "Kontakte"
+      }
+    ];
+
+    // Tcheke otantifikasyon lè paj la ouvri
+    function isAuthenticated() {
+      return sessionStorage.getItem(AUTH_KEY) === "true";
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initMembersStorage();
+      updateLockoutStateUI();
+      if (isAuthenticated()) {
+        closePasswordPromptModal();
+        renderMembers();
+      } else {
+        openPasswordPromptModal();
+        renderLockedState();
+      }
+      loadArticlesCount();
+    });
+
+    function openPasswordPromptModal() {
+      const modal = document.getElementById("passwordPromptModal");
+      const input = document.getElementById("promptPasswordInput");
+      const errorMsg = document.getElementById("promptErrorMsg");
+      if (modal) modal.classList.remove("hidden");
+      if (errorMsg && !isCurrentlyLockedOut() && getFailedAttempts() === 0) {
+        errorMsg.classList.add("hidden");
+      }
+      updateLockoutStateUI();
+      if (input && !isCurrentlyLockedOut()) {
+        input.value = "";
+        setTimeout(() => input.focus(), 100);
+      }
+    }
+
+    function closePasswordPromptModal() {
+      const modal = document.getElementById("passwordPromptModal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    function togglePromptPasswordVisibility() {
+      const input = document.getElementById("promptPasswordInput");
+      const btn = document.getElementById("togglePasswordBtn");
+      if (!input) return;
+      if (input.type === "password") {
+        input.type = "text";
+        if (btn) btn.textContent = "🙈 Kache";
+      } else {
+        input.type = "password";
+        if (btn) btn.textContent = "👁️ Montre";
+      }
+    }
+
+    function handlePasswordPrompt(e) {
+      e.preventDefault();
+
+      if (isCurrentlyLockedOut()) {
+        updateLockoutStateUI();
+        return;
+      }
+
+      const input = document.getElementById("promptPasswordInput");
+      const errorMsg = document.getElementById("promptErrorMsg");
+      const errorText = document.getElementById("promptErrorText");
+      const enteredPass = (input ? input.value : "").trim();
+
+      // Verifikasyon modpas administratè a
+      if (enteredPass === getAdminPassword()) {
+        clearLockout();
+        sessionStorage.setItem(AUTH_KEY, "true");
+        if (errorMsg) errorMsg.classList.add("hidden");
+        closePasswordPromptModal();
+        // Rekipere epi afiche done manm yo sèlman apre siksè
+        renderMembers();
+        showAuthSuccessToast();
+      } else {
+        // Modpas la pa kòrèk
+        const currentAttempts = getFailedAttempts() + 1;
+        setFailedAttempts(currentAttempts);
+
+        if (currentAttempts >= MAX_ATTEMPTS) {
+          // 3yèm tantativ echwe -> Bloke pou 30 minit (1800000ms)
+          setLockoutUntil(Date.now() + LOCKOUT_TIME_MS);
+          if (errorMsg) {
+            errorMsg.className = "text-xs text-rose-300 mt-2.5 font-semibold flex items-start gap-2.5 bg-rose-500/20 border border-rose-500/40 p-3 rounded-xl";
+            if (errorText) {
+              errorText.textContent = "Modpas la pa kòrèk (Tantativ 3/3). Ou fin itilize tout 3 tantativ yo! Espas la bloke pou 30 minit poutèt sekirite.";
+            }
+            errorMsg.classList.remove("hidden");
+          }
+          updateLockoutStateUI();
+        } else {
+          // 1/3 oswa 2/3
+          if (errorMsg) {
+            errorMsg.className = "text-xs text-rose-300 mt-2.5 font-semibold flex items-start gap-2.5 bg-rose-500/15 border border-rose-500/30 p-3 rounded-xl";
+            if (errorText) {
+              if (currentAttempts === 1) {
+                errorText.textContent = "Modpas la pa kòrèk (Tantativ 1/3). Ou gen 2 tantativ ki rete anvan espas la bloke pou 30 minit.";
+              } else {
+                errorText.textContent = "Modpas la pa kòrèk (Tantativ 2/3). ATANSYON: Li rete w 1 sèl tantativ anvan espas la bloke pou 30 minit!";
+              }
+            }
+            errorMsg.classList.remove("hidden");
+          }
+          updateLockoutStateUI();
+          if (input) {
+            input.value = "";
+            input.focus();
+          }
+        }
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem(AUTH_KEY);
+      renderLockedState();
+      openPasswordPromptModal();
+    }
+
+    function renderLockedState() {
+      const tbody = document.getElementById("membersTableBody");
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr id="authLockedRow">
+            <td colspan="7" class="py-14 px-4 text-center">
+              <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-800 text-amber-400 border border-slate-700 shadow-inner mb-3 text-2xl">
+                🔒
+              </div>
+              <h3 class="text-base font-bold text-white">Done Manm yo Pwoteje pa Modpas</h3>
+              <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
+                Pou pwoteje konfidansyalite jèn ki enskri yo, done yo pa afiche toutotan ou pa verifye modpas administratè a nan bwat modal la.
+              </p>
+              <button 
+                type="button"
+                onclick="openPasswordPromptModal()" 
+                class="mt-4 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-all shadow-lg shadow-emerald-600/30 inline-flex items-center gap-2"
+              >
+                <span>🔑 Ouvri Modal Modpas la</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      }
+      document.getElementById("kpiTotalMembers").textContent = "🔒";
+      document.getElementById("kpiContactedMembers").textContent = "🔒";
+      document.getElementById("kpiDepartmentsCount").textContent = "🔒";
+      const noResults = document.getElementById("noResultsNotice");
+      if (noResults) noResults.classList.add("hidden");
+    }
+
+    function showAuthSuccessToast() {
+      let toast = document.getElementById("authToast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "authToast";
+        toast.className = "fixed bottom-5 right-5 z-50 bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-semibold transform transition-all duration-300 pointer-events-none";
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = `
+        <span class="text-lg">✅</span>
+        <div>
+          <div class="font-bold text-white">Otantifikasyon Reyisi!</div>
+          <div class="text-emerald-100 text-[11px] font-normal">Aksè administrasyon an louvri avèk siksè.</div>
+        </div>
+      `;
+      toast.style.opacity = "1";
+      toast.style.transform = "translateY(0)";
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(10px)";
+      }, 3500);
+    }
+
+    // Fonksyon pou jesyon Chanjman Modpas Admin
+    function openChangePasswordModal() {
+      const modal = document.getElementById("changePasswordModal");
+      if (modal) modal.classList.remove("hidden");
+      document.getElementById("currentAdminPassInput").value = "";
+      document.getElementById("newAdminPassInput").value = "";
+      document.getElementById("confirmNewAdminPassInput").value = "";
+      const err = document.getElementById("changePassErrorMsg");
+      const succ = document.getElementById("changePassSuccessMsg");
+      if (err) err.classList.add("hidden");
+      if (succ) succ.classList.add("hidden");
+    }
+
+    function closeChangePasswordModal() {
+      const modal = document.getElementById("changePasswordModal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    function handleChangePasswordSubmit(e) {
+      e.preventDefault();
+      const current = document.getElementById("currentAdminPassInput").value.trim();
+      const newPass = document.getElementById("newAdminPassInput").value.trim();
+      const confirmPass = document.getElementById("confirmNewAdminPassInput").value.trim();
+      const err = document.getElementById("changePassErrorMsg");
+      const succ = document.getElementById("changePassSuccessMsg");
+
+      if (err) err.classList.add("hidden");
+      if (succ) succ.classList.add("hidden");
+
+      if (current !== getAdminPassword()) {
+        if (err) {
+          err.textContent = "Modpas aktyèl la pa kòrèk!";
+          err.classList.remove("hidden");
+        }
+        return;
+      }
+
+      if (newPass.length < 6) {
+        if (err) {
+          err.textContent = "Nouvo modpas la dwe gen omwen 6 karaktè!";
+          err.classList.remove("hidden");
+        }
+        return;
+      }
+
+      if (newPass !== confirmPass) {
+        if (err) {
+          err.textContent = "De nouvo modpas yo pa koresponn!";
+          err.classList.remove("hidden");
+        }
+        return;
+      }
+
+      setAdminPassword(newPass);
+      if (succ) {
+        succ.textContent = "Modpas administratè a chanje avèk siksè!";
+        succ.classList.remove("hidden");
+      }
+      setTimeout(() => {
+        closeChangePasswordModal();
+      }, 1200);
+    }
+
+    function initMembersStorage() {
+      if (!localStorage.getItem(STORAGE_KEY)) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_MEMBERS));
+      }
+    }
+
+    function getMembers() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveMembers(members) {
+      if (!isAuthenticated()) {
+        openPasswordPromptModal();
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
+      renderMembers();
+    }
+
+    function renderMembers() {
+      if (!isAuthenticated()) {
+        renderLockedState();
+        return;
+      }
+
+      const members = getMembers();
+      const tbody = document.getElementById("membersTableBody");
+      const searchVal = (document.getElementById("searchInput")?.value || "").toLowerCase();
+      const deptFilter = document.getElementById("departmentFilter")?.value || "all";
+      const noResults = document.getElementById("noResultsNotice");
+
+      // Filtre
+      const filtered = members.filter(m => {
+        const matchesSearch = 
+          (m.firstName || "").toLowerCase().includes(searchVal) ||
+          (m.lastName || "").toLowerCase().includes(searchVal) ||
+          (m.whatsapp || "").toLowerCase().includes(searchVal) ||
+          (m.email || "").toLowerCase().includes(searchVal) ||
+          (m.department || "").toLowerCase().includes(searchVal);
+
+        const matchesDept = deptFilter === "all" || m.department === deptFilter;
+        return matchesSearch && matchesDept;
+      });
+
+      // Mete ajou KPIs
+      document.getElementById("kpiTotalMembers").textContent = members.length;
+      document.getElementById("kpiContactedMembers").textContent = 
+        members.filter(m => m.status === "Kontakte" || m.status === "Manm Ofisyèl").length;
+
+      const uniqueDepts = new Set(members.map(m => m.department)).size;
+      document.getElementById("kpiDepartmentsCount").textContent = uniqueDepts;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = "";
+        noResults.classList.remove("hidden");
+        return;
+      }
+
+      noResults.classList.add("hidden");
+
+      tbody.innerHTML = filtered.map(m => {
+        const cleanPhone = (m.whatsapp || "").replace(/[^0-9]/g, "");
+        const waLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Bonjou ' + m.firstName + ', mwen se Clauvens EXAUS (Fondatè ClubNou). Mwen kontan resevwa enskripsyon w!')}`;
+
+        let badgeColor = "bg-amber-500/20 text-amber-300 border-amber-500/30";
+        if (m.status === "Kontakte") badgeColor = "bg-blue-500/20 text-blue-300 border-blue-500/30";
+        if (m.status === "Manm Ofisyèl") badgeColor = "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
+
+        return `
+          <tr class="hover:bg-slate-700/40 transition-colors">
+            <td class="py-4 px-4">
+              <div class="font-bold text-white">${escapeHtml(m.firstName)} ${escapeHtml(m.lastName)}</div>
+              <div class="text-[11px] text-slate-400">${escapeHtml(m.email || 'Pa gen email')}</div>
+            </td>
+            <td class="py-4 px-4 whitespace-nowrap">
+              <div class="font-mono text-emerald-400 font-semibold">${escapeHtml(m.whatsapp)}</div>
+              <a href="${waLink}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-teal-300 hover:text-teal-200 mt-0.5">
+                <span>💬 Louvri WhatsApp</span>
+              </a>
+            </td>
+            <td class="py-4 px-4">
+              <span class="px-2.5 py-1 rounded-full bg-slate-700/80 text-slate-200 text-[11px] font-medium border border-slate-600">
+                ${escapeHtml(m.department || 'Ayiti')}
+              </span>
+            </td>
+            <td class="py-4 px-4 text-slate-300">
+              ${escapeHtml(m.domain || 'Jèn lidè')}
+            </td>
+            <td class="py-4 px-4 max-w-xs text-slate-400 truncate" title="${escapeHtml(m.bio || '')}">
+              ${escapeHtml(m.bio || '—')}
+            </td>
+            <td class="py-4 px-4 text-slate-400 whitespace-nowrap">
+              ${escapeHtml(m.date || '—')}
+            </td>
+            <td class="py-4 px-4 text-right whitespace-nowrap space-x-2">
+              <button onclick="toggleMemberStatus('${m.id}')" class="px-2 py-1 text-[10px] rounded border ${badgeColor}">
+                ${escapeHtml(m.status || 'Nouvo')}
+              </button>
+              <button onclick="deleteMember('${m.id}')" class="text-rose-400 hover:text-rose-300 p-1 text-sm" title="Efase manm sa a">
+                🗑️
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function toggleMemberStatus(id) {
+      const members = getMembers();
+      const member = members.find(m => m.id === id);
+      if (!member) return;
+
+      if (!member.status || member.status === "Nouvo") {
+        member.status = "Kontakte";
+      } else if (member.status === "Kontakte") {
+        member.status = "Manm Ofisyèl";
+      } else {
+        member.status = "Nouvo";
+      }
+
+      saveMembers(members);
+    }
+
+    function deleteMember(id) {
+      if (!confirm("Èske w sèten ou vle retire manm sa a nan lis la?")) return;
+      const members = getMembers().filter(m => m.id !== id);
+      saveMembers(members);
+    }
+
+    function handleSearch() {
+      renderMembers();
+    }
+
+    function handleFilter() {
+      renderMembers();
+    }
+
+    function resetDemoData() {
+      if (!isAuthenticated()) {
+        openPasswordPromptModal();
+        return;
+      }
+      if (confirm("Èske w vle reyinisyalize lis la avèk egzanp yo?")) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_MEMBERS));
+        renderMembers();
+      }
+    }
+
+    function openAddMemberModal() {
+      if (!isAuthenticated()) {
+        openPasswordPromptModal();
+        return;
+      }
+      document.getElementById("addMemberModal").classList.remove("hidden");
+    }
+
+    function closeAddMemberModal() {
+      document.getElementById("addMemberModal").classList.add("hidden");
+      document.getElementById("manualAddForm").reset();
+    }
+
+    function handleManualAdd(e) {
+      e.preventDefault();
+      if (!isAuthenticated()) {
+        openPasswordPromptModal();
+        return;
+      }
+      const newMember = {
+        id: "mb-" + Date.now(),
+        firstName: document.getElementById("mFirstName").value.trim(),
+        lastName: document.getElementById("mLastName").value.trim(),
+        whatsapp: document.getElementById("mWhatsApp").value.trim(),
+        email: document.getElementById("mEmail").value.trim(),
+        department: document.getElementById("mDepartment").value,
+        domain: document.getElementById("mDomain").value.trim() || "Antreprenarya",
+        bio: document.getElementById("mBio").value.trim(),
+        date: new Date().toLocaleDateString("fr-FR", { day: 'numeric', month: 'short', year: 'numeric' }),
+        status: "Nouvo"
+      };
+
+      const members = getMembers();
+      members.unshift(newMember);
+      saveMembers(members);
+      closeAddMemberModal();
+      alert("✅ Nouvo manm lan anrejistre avèk siksè!");
+    }
+
+    function exportToCSV() {
+      if (!isAuthenticated()) {
+        openPasswordPromptModal();
+        return;
+      }
+      const members = getMembers();
+      if (members.length === 0) {
+        alert("Pa gen okenn manm pou ekspòte!");
+        return;
+      }
+
+      let csv = "ID,Prenon,Nom,WhatsApp,Email,Depatman,Domen,Deskripsyon,Dat,Estati\n";
+      members.forEach(m => {
+        csv += `"${m.id}","${(m.firstName||'').replace(/"/g, '""')}","${(m.lastName||'').replace(/"/g, '""')}","${m.whatsapp||''}","${m.email||''}","${m.department||''}","${(m.domain||'').replace(/"/g, '""')}","${(m.bio||'').replace(/"/g, '""')}","${m.date||''}","${m.status||''}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `ClubNou_Manm_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    async function loadArticlesCount() {
+      try {
+        const res = await fetch("data/articles.json");
+        if (res.ok) {
+          const articles = await res.json();
+          if (Array.isArray(articles)) {
+            document.getElementById("kpiTotalArticles").textContent = articles.length;
+          }
+        }
+      } catch (e) {
+        console.log("Articles count fetch fallback:", e);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
