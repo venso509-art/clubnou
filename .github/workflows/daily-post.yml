@@ -18,12 +18,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: ⚙️ Enstale Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: 📦 Enstale Depandans yo
+      - name: 📦 Enstale Depandans AI yo
         run: |
           npm install @google/genai dotenv --no-audit --no-fund
 
