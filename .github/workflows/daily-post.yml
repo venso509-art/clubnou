@@ -2,9 +2,7 @@ name: ClubNou Autonomous AI Post Generator
 
 on:
   schedule:
-    # 2 fwa pa jou: 6:00 AM ak 4:00 PM Lè Ayiti (UTC-4) -> 10:00 & 20:00 UTC
     - cron: '0 10,20 * * *'
-  # Pèmèt deklanchman manyèl depi koòdone GitHub Actions la ("Run workflow")
   workflow_dispatch:
 
 permissions:
@@ -39,17 +37,15 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Ajoute fichye atik yo
           git add data/articles.json
           if [ -f public/data/articles.json ]; then
             git add public/data/articles.json
           fi
           
-          # Tcheke si gen chanjman pou komèt
           if git diff --staged --quiet; then
             echo "Pa gen nouvo chanjman pou pibliye."
           else
             git commit -m "Auto: Nouvo atik ClubNou pibliye pa AI [skip ci]"
             git push origin HEAD:${{ github.ref }} || git push
-            echo "✅ Nouvo atik la pouse avèk siksè sou GitHub! Netlify ap deplwaye l touswit."
+            echo "✅ Nouvo atik la pouse avèk siksè sou GitHub!"
           fi
