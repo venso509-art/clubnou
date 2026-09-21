@@ -134,10 +134,10 @@ Retounen yon objè JSON san okenn tèks anvan oswa apre, ak estrikti egzak sa a:
 
   console.log("🤖 Ap voye demann bay Google Gemini API...");
   
-  // Eseye modèl yo nan lòd: gemini-2.5-flash (demann itilizatè), gemini-3.6-flash, gemini-2.0-flash
+  // Modèl ofisyèl Google Gemini SDK (@google/genai)
   const candidateModels = [
     process.env.GEMINI_MODEL || 'gemini-2.5-flash',
-    'gemini-3.6-flash',
+    'gemini-2.5-pro',
     'gemini-2.0-flash'
   ];
 
@@ -160,7 +160,7 @@ Retounen yon objè JSON san okenn tèks anvan oswa apre, ak estrikti egzak sa a:
       console.log(`✅ Siksè avèk modèl: ${modelName}!`);
       break;
     } catch (err) {
-      console.warn(`⚠️ Modèl ${modelName} pa t disponib: ${err.message}`);
+      console.warn(`⚠️ Modèl ${modelName} echwe: ${err.message}`);
     }
   }
 

@@ -30,7 +30,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Enstale Depandans yo
-        run: npm install
+        run: npm --prefer-offline --no-audit install
 
       - name: 🤖 Egzekite Script AI ClubNou (Gemini API)
         env:
@@ -39,8 +39,8 @@ jobs:
 
       - name: 🚀 Konfigire Git epi Pouse Nouvo Atik la
         run: |
-          git config --global user.name "ClubNou AI Automation Bot"
-          git config --global user.email "bot@clubnou.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           # Ajoute fichye atik yo
           git add data/articles.json
@@ -53,6 +53,6 @@ jobs:
             echo "Pa gen nouvo chanjman pou pibliye."
           else
             git commit -m "Auto: Nouvo atik ClubNou pibliye pa AI [skip ci]"
-            git push origin main || git push
+            git push origin HEAD:${{ github.ref }} || git push
             echo "✅ Nouvo atik la pouse avèk siksè sou GitHub! Netlify ap deplwaye l touswit."
           fi
