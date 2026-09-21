@@ -103,7 +103,7 @@
     }
 
     /* ========================================================= */
-    /* 2. ELEGANT: POU TOUT BOUTON YO (KONTAK, LI ATIK, CTA...)  */
+    /* 2. ELEGANT: POU ELEMAN EDITORYAL AK TIT SIYATI           */
     /* ========================================================= */
     @font-face {
       font-family: 'Elegant';
@@ -111,24 +111,28 @@
       font-display: swap;
     }
 
-    .font-elegant,
-    button,
+    .font-elegant {
+      font-family: 'Elegant', 'Prata', 'Playfair Display', 'Bodoni Moda', 'Cormorant Garamond', Georgia, serif !important;
+      letter-spacing: 0.025em;
+    }
+
+    /* Typo dous, modèn e pwòp pou tout Header, Navigasyon, ak Bouton Entèfas */
+    header,
+    header nav,
+    header nav a,
+    header button,
+    #desktopAuthContainer button,
+    #desktopAuthContainer a,
+    .nav-link,
     .btn-sleek-primary,
     .btn-sleek-secondary,
-    .finora-pill-btn,
-    a.btn-sleek-primary,
-    a.btn-sleek-secondary,
-    a.finora-pill-btn,
     .btn-action,
-    .btn-contact,
     .btn-read-article,
     #heroCtaBtn,
     #desktopLoginBtn,
-    #openArchiveBtn,
-    input[type="submit"],
-    input[type="button"] {
-      font-family: 'Elegant', 'Prata', 'Playfair Display', 'Bodoni Moda', 'Cormorant Garamond', Georgia, serif !important;
-      letter-spacing: 0.035em;
+    #desktopRegisterBtn,
+    #openArchiveBtn {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
     }
 
     /* Garanti ikòn FontAwesome yo rete entak anndan bouton yo */
@@ -302,11 +306,11 @@
   <!-- ========================================== -->
   <!-- 1. HEADER PWOFESYONÈL & NAVIGATION        -->
   <!-- ========================================== -->
-  <header class="sticky top-0 z-50 bg-slate-950/85 backdrop-blur-xl border-b border-slate-800/80 shadow-lg shadow-black/30 transition-all">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+  <header class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/80 shadow-lg shadow-black/40 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
       
       <!-- Brand Logo & Non Mak -->
-      <a href="#akey" class="flex items-center gap-3.5 group" id="navbarBrandLink">
+      <a href="#akey" class="flex items-center gap-3 group shrink-0" id="navbarBrandLink">
         <div class="relative shrink-0">
           <img 
             id="navbarLogoImg"
@@ -317,124 +321,37 @@
           />
           <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950" title="Rezo Aktif"></span>
         </div>
-        <div>
+        <div class="shrink-0">
           <div class="flex items-center gap-2">
             <span class="text-xl sm:text-2xl font-black tracking-tight font-heading group-hover:opacity-95 transition-opacity">
               <span class="text-[#2563eb]">Club</span><span class="text-[#d4af37]">Nou</span>
             </span>
-            <span class="hidden sm:inline-block text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-[#b0950d]/30">Ayiti</span>
+            <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-[#b0950d]/30">Ayiti</span>
           </div>
           <p class="text-[10px] sm:text-[11px] text-slate-400 font-medium tracking-wide">Rezo Envestisman Jèn Antreprenè</p>
         </div>
       </a>
 
-      <!-- Desktop Navigation Menu -->
-      <nav class="hidden lg:flex items-center gap-7 text-xs font-semibold uppercase tracking-wider text-slate-300">
-        <a href="#akey" class="hover:text-emerald-400 transition-colors">Akèy</a>
-        <a href="#sakap-fet" class="hover:text-emerald-400 transition-colors">Sakap Fèt?</a>
-        <a href="#kijan-li-mache" class="hover:text-emerald-400 transition-colors">Kijan l Mache</a>
-        <a href="#atik" class="hover:text-emerald-400 transition-colors">Atik & Edikasyon</a>
-        <a href="#tontin" class="hover:text-emerald-400 transition-colors">Tontin Modèn</a>
-        <a href="admin.html" class="text-slate-500 hover:text-slate-300 p-1.5 transition-all opacity-40 hover:opacity-100 flex items-center justify-center rounded-lg" title="Aksè" aria-label="Aksè">
-          <i class="fa-solid fa-key text-xs"></i>
-        </a>
-      </nav>
-
-      <!-- Desktop Auth Button & Contact Link (Finora Model) -->
-      <div class="hidden sm:flex items-center gap-5">
-        <a href="#kontak" class="font-elegant text-xs font-semibold text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-1.5 tracking-wide">
-          <span>Kontak Fondatè</span>
-          <i class="fa-solid fa-arrow-right text-[11px]"></i>
-        </a>
-
-        <div id="desktopAuthContainer" class="flex items-center gap-2.5">
-          <!-- Guest State: Finora Lime Pill Button + Bouton Entegre Rezo a -->
-          <button 
-            type="button" 
-            id="desktopRegisterBtn"
-            onclick="openAuthModal('register')" 
-            class="font-elegant px-4 py-2 rounded-full text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 shadow-md shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
-          >
-            <i class="fa-solid fa-user-plus text-[11px]"></i>
-            <span>Entegre Rezo a</span>
-          </button>
-          <button 
-            type="button" 
-            id="desktopLoginBtn"
-            onclick="openAuthModal('login')" 
-            class="finora-pill-btn font-elegant px-5 py-2 rounded-full text-xs flex items-center gap-1.5 cursor-pointer"
-          >
-            <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
-            <span>Koneksyon</span>
-          </button>
-
-          <!-- Authenticated State: User Badge & Dropdown Menu -->
-          <div id="desktopUserBadge" class="hidden relative">
-            <button 
-              type="button" 
-              onclick="toggleUserDropdown()" 
-              class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/40 hover:border-emerald-400 text-white text-xs font-semibold shadow-md transition-all fintech-card cursor-pointer"
-            >
-              <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold flex items-center justify-center text-xs" id="userInitial">M</span>
-              <span id="headerUserName" class="max-w-[120px] truncate text-slate-200 font-bezoria font-bold text-sm">Manm</span>
-              <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
-            </button>
-            
-            <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-60 fintech-card-active rounded-2xl p-2 z-50 space-y-1">
-              <div class="px-3 py-2.5 border-b border-slate-800/80 text-[11px]">
-                <p class="font-bold text-white truncate font-bezoria text-sm tracking-wide" id="dropdownUserFullName">Manm</p>
-                <p class="text-slate-400 truncate text-[10px]" id="dropdownUserEmail">email@clubnou.com</p>
-                <span class="inline-block mt-1.5 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 font-bold text-[10px]" id="dropdownUserDept">Depatman</span>
-              </div>
-              <button 
-                type="button" 
-                onclick="openProfileModal(); toggleUserDropdown()" 
-                class="w-full text-left px-3 py-2.5 rounded-xl text-xs text-slate-200 hover:bg-slate-800 hover:text-white flex items-center gap-2.5 transition-colors cursor-pointer"
-              >
-                <i class="fa-solid fa-user text-slate-400 text-xs w-4 text-center"></i>
-                <span>Pwofil Mwen</span>
-              </button>
-              <button 
-                type="button" 
-                onclick="openJoinCommunityModal(); toggleUserDropdown()" 
-                class="w-full text-left px-3 py-2.5 rounded-xl text-xs text-emerald-400 hover:bg-emerald-500/10 flex items-center gap-2.5 font-semibold transition-colors cursor-pointer"
-              >
-                <i class="fa-solid fa-bolt-lightning text-emerald-400 text-xs w-4 text-center"></i>
-                <span>Kominote Envestisman</span>
-              </button>
-              <button 
-                type="button" 
-                onclick="logoutUser(); toggleUserDropdown()" 
-                class="w-full text-left px-3 py-2.5 rounded-xl text-xs text-rose-400 hover:bg-rose-500/10 flex items-center gap-2.5 font-semibold transition-colors cursor-pointer"
-              >
-                <i class="fa-solid fa-arrow-right-from-bracket text-rose-400 text-xs w-4 text-center"></i>
-                <span>Dekonekte</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mobile Menu Hamburger Button Sou Bò Dwat -->
+      <!-- 3 Ti Trè Menu Button (Pou tout ekran: mobil ak òdinatè) -->
       <button 
         type="button" 
         id="mobileMenuBtn" 
         onclick="toggleMobileMenu()" 
-        class="lg:hidden p-2.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 text-slate-300 hover:text-white transition-all cursor-pointer shadow-md focus:outline-none"
+        class="p-2.5 sm:p-3 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 text-slate-200 hover:text-white transition-all cursor-pointer shadow-lg hover:shadow-amber-500/10 focus:outline-none flex items-center justify-center group"
         aria-label="Louvri meni navigasyon"
       >
-        <svg id="hamburgerIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        <svg id="hamburgerIcon" class="w-6 h-6 sm:w-7 sm:h-7 transition-transform group-hover:scale-105" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
-        <svg id="closeIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        <svg id="closeIcon" class="w-6 h-6 sm:w-7 sm:h-7 hidden text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </button>
 
     </div>
 
-    <!-- Mobile Dropdown Navigation -->
-    <div id="mobileMenu" class="hidden lg:hidden bg-slate-950/95 backdrop-blur-2xl border-b border-amber-500/20 px-6 py-6 space-y-4 shadow-2xl">
+    <!-- Dropdown Navigation (Louvri lè w klike sou 3 ti trè yo) -->
+    <div id="mobileMenu" class="hidden bg-slate-950/95 backdrop-blur-2xl border-b border-amber-500/20 px-6 py-6 space-y-4 shadow-2xl max-w-7xl mx-auto">
       <nav class="flex flex-col space-y-3 text-sm font-semibold text-slate-200">
         <a href="#akey" onclick="toggleMobileMenu()" class="py-2 border-b border-slate-900 hover:text-emerald-400 flex items-center justify-between">
           <span>Akèy</span>
