@@ -2,13 +2,11 @@ name: ClubNou Autonomous AI Post Generator
 
 on:
   schedule:
-    # 2 fwa pa jou: 6:00 AM ak 4:00 PM Lè Ayiti (UTC-4)
-    # Sa koresponn ak 10:00 UTC ak 20:00 UTC
+    # 2 fwa pa jou: 6:00 AM ak 4:00 PM Lè Ayiti (UTC-4) -> 10:00 & 20:00 UTC
     - cron: '0 10,20 * * *'
   # Pèmèt deklanchman manyèl depi koòdone GitHub Actions la ("Run workflow")
   workflow_dispatch:
 
-# Pèmisyon esansyèl pou bot la ka pouse (push) chanjman yo sou branch lan
 permissions:
   contents: write
 
@@ -26,11 +24,10 @@ jobs:
       - name: ⚙️ Enstale Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
+          node-version: 22
 
       - name: 📦 Enstale Depandans yo
-        run: npm --prefer-offline --no-audit install
+        run: npm install
 
       - name: 🤖 Egzekite Script AI ClubNou (Gemini API)
         env:
