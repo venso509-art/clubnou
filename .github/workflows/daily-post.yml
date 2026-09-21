@@ -16,16 +16,16 @@ jobs:
       - name: 📥 Rekipere Kòd Sous la (Checkout)
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: ⚙️ Enstale Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
       - name: 📦 Enstale Depandans yo
-        run: npm install
+        run: |
+          npm install @google/genai dotenv --no-audit --no-fund
 
       - name: 🤖 Egzekite Script AI ClubNou (Gemini API)
         env:
@@ -34,8 +34,8 @@ jobs:
 
       - name: 🚀 Konfigire Git epi Pouse Nouvo Atik la
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           
           git add data/articles.json
           if [ -f public/data/articles.json ]; then
@@ -46,6 +46,6 @@ jobs:
             echo "Pa gen nouvo chanjman pou pibliye."
           else
             git commit -m "Auto: Nouvo atik ClubNou pibliye pa AI [skip ci]"
-            git push origin HEAD:${{ github.ref }} || git push
+            git push
             echo "✅ Nouvo atik la pouse avèk siksè sou GitHub!"
           fi
